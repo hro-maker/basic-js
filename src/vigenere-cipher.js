@@ -19,13 +19,81 @@ import { NotImplementedError } from '../extensions/index.js';
  * reverseMachine.decrypt('AEIHQX SX DLLU!', 'alphonse') => '!NWAD TA KCATTA'
  * 
  */
-export default class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+ export default class VigenereCipheringMachine {
+  constructor (flexMachine) {
+    this.machine = (flexMachine === false);
+    this.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  encrypt(message, key) {
+    if (!message || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    message = message.toUpperCase();
+    key = key.toUpperCase();
+    let encrypted = "";
+    let convertedKey = "";
+    for (let i = 0, j = 0; i < message.length; i++) {
+      if (this.alphabet.indexOf(message[i]) == -1) {
+        convertedKey += message[i];
+        continue;
+      }
+      if (j >= key.length) {
+        j = 0;
+      }
+      convertedKey += key[j];
+      j++;
+    }
+    for (let i = 0; i < message.length; i++) {
+      if (this.alphabet.indexOf(message[i]) == -1) {
+        encrypted += message[i];
+        continue;
+      }
+      let shift = this.alphabet.indexOf(message[i]) + this.alphabet.indexOf(convertedKey[i]);
+      if (shift <= 25) {
+        encrypted += this.alphabet[shift];
+        continue;
+      }
+      encrypted += this.alphabet[shift - 26];
+    }
+    if (this.machine) {
+      return encrypted.split("").reverse().join("");
+    }
+    return encrypted;
+  }    
+  decrypt(encryptedMessage, key) {
+    if (!encryptedMessage || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    encryptedMessage = encryptedMessage.toUpperCase();
+    key = key.toUpperCase();
+    let decrypted = "";
+    let convertedKey = "";
+    for (let i = 0, j = 0; i < encryptedMessage.length; i++) {
+      if (this.alphabet.indexOf(encryptedMessage[i]) == -1) {
+        convertedKey += encryptedMessage[i];
+        continue;
+      }
+      if (j >= key.length) {
+        j = 0;
+      }
+      convertedKey += key[j];
+      j++;
+    }
+    for (let i = 0; i < encryptedMessage.length; i++) {
+      if (this.alphabet.indexOf(encryptedMessage[i]) == -1) {
+        decrypted += encryptedMessage[i];
+        continue;
+      }
+      let shift = this.alphabet.indexOf(encryptedMessage[i]) - this.alphabet.indexOf(convertedKey[i]);
+      if (shift < 0) {
+        decrypted += this.alphabet[shift + 26];
+        continue;
+      }
+      decrypted += this.alphabet[shift];
+    }
+    if (this.machine) {
+      return decrypted.split("").reverse().join("");
+    }
+    return decrypted;
   }
 }
